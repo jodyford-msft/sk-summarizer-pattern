@@ -7,6 +7,7 @@ BUN_BUILD=bun run build
 NET_WWW_FOLDER=src/backend/wwwroot
 PY_WWW_FOLDER=src/pybackend/wwwroot
 PYLANG_WWW_FOLDER=src/pylangbackend/wwwroot
+DOCKER_TAG=0.0.9
 
 default:
 	@echo "Please specify a target to make."
@@ -55,7 +56,6 @@ run-pylang: build-ui-lang
 	@echo "Running UI lang..."	
 	cd src/pylangbackend && $(PYTHON_RUN)
 
-DOCKER_TAG=0.0.8
 docker-cs: build-ui-cs
 	@echo ".NET build..."
 	cd src/backend && docker build . -t am8850/sksummarizer:$(DOCKER_TAG)

@@ -29,6 +29,10 @@ interface IResponse {
   summaries: ISummary[]
 }
 
+const Labels = {
+  title: "Summarizer Commander",
+}
+
 const App = () => {
 
   const [status, setStatus] = createSignal(DEFAULT_MSG)
@@ -77,10 +81,10 @@ const App = () => {
 
   return (
     <>
-      <nav class="bg-purple-950 text-white p-3 font-bold h-[50px]">
-        SK Summarizer
-      </nav>
-      <div class="p-2 text-white bg-purple-900 flex flex-row space-x-2 items-center h-[50px]">
+      <header class="bg-purple-950 text-white p-2 font-bold h-[40px] flex items-center">
+        <label>{Labels.title}</label>
+      </header>
+      <div class="p-2 text-white bg-purple-900 flex flex-row space-x-2 items-center h-[40px]">
         <label class="font-bold text-sm uppercase">Text Chunk Size (2.5k):</label>
         <input
           value={settings().chunk_size}
@@ -97,76 +101,72 @@ const App = () => {
           onChange={(e) => setSettings({ ...settings(), temperature: e.target.value })}
           class="px-1 text-black border w-16"></input>
       </div>
-      <main class="mx-10 p-2 flex flex-col space-y-3">
-        <label class="font-bold text-sm uppercase">Prompt (<span>{inText().split("").length})</span></label>
-        <textarea
-          value={prompt()}
-          onchange={(e) => setPrompt(e.target.value)}
-          class="p-2 border rounded" rows={7}></textarea>
-        <div>
-          <strong>Note: </strong>In the prompt, use the <code>&lt;TEXT&gt;</code> placeholder to indicate where the text resource below should be inserted.
-        </div>
-        <div class="flex flex-row space-x-2">
-          <button
-            onClick={Process}
-            class="p-2 w-32 rounded bg-purple-950 hover:bg-purple-900 text-white text-sm font-semibold">
-            <div class="flex flex-row w-full justify-center space-x-3">
-              <span>Process {processing() && <Spinner type={SpinnerType.puff} color="white" class="inline-block" height={20} />}</span>
-            </div>
-          </button>
-          <button
-            onClick={Clear}
-            class="p-2 w-32 rounded bg-red-800 hover:bg-red-700 text-white text-sm font-semibold">Reset</button>
-        </div>
-        <div class="flex flex-row">
-          {/* input */}
-          <div class={"flex flex-col p-2 " + (summaries().length > 1 ? "w-1/3" : "w-1/2")}>
-            <label class="font-bold text-sm uppercase">Text Resource (Tokens: {inText().split("").length})</label>
-            <textarea
-              value={inText()}
-              oninput={(e) => setInText(e.target.value)}
-              class="p-2 border rounded" rows={30}></textarea>
+      <div class="flex h-[calc(100vh-40px-40px-30px)]">
+        <div class={"bg-slate-50 flex flex-col p-2 space-y-2 " + (summaries().length > 1 ? "w-1/3" : "w-1/2")}>
+          <label class="font-bold text-sm uppercase">Prompt (<span>{inText().split("").length})</span></label>
+          <textarea
+            value={prompt()}
+            onchange={(e) => setPrompt(e.target.value)}
+            class="p-2 border rounded outline-none" rows={7}></textarea>
+          <div class="bg-yellow-200 p-2">
+            <strong>Note: </strong>In the prompt, use the <code>&lt;TEXT&gt;</code> placeholder to indicate where the text resource below should be inserted.
           </div>
-          <div class={"flex flex-col p-2 " + (summaries().length > 1 ? "w-1/3" : "hidden")}>
-            <label class="font-bold text-sm uppercase">Chunk Details (Chunks: {summaries().length})</label>
-            {summaries().length > 0 ? <>
-              <For each={summaries()}>{(chunkSummary, idx) =>
-                <div class="flex flex-col w-full border rounded-md mb-2">
-                  <div class="p-1 flex flex-col bg-teal-50">
-                    <label class="bg-slate-800 text-white text-sm font-semibold uppercase">Chunk text - {idx() + 1}</label>
-                    <hr />
-                    {chunkSummary.content}
-                  </div>
-                  <div class="p-1 flex flex-col bg-teal-100">
-                    <label class="bg-slate-800 text-white text-sm font-semibold uppercase">Summary - {idx() + 1}</label>
-                    <hr />
-                    {chunkSummary.summary}</div>
+          <div class="flex flex-row space-x-2">
+            <button
+              onClick={Process}
+              class="p-2 w-32 rounded bg-purple-950 hover:bg-purple-900 text-white text-sm font-semibold">
+              <div class="flex flex-row w-full justify-center space-x-3">
+                <span>Process {processing() && <Spinner type={SpinnerType.puff} color="white" class="inline-block" height={20} />}</span>
+              </div>
+            </button>
+            <button
+              onClick={Clear}
+              class="p-2 w-32 rounded bg-red-800 hover:bg-red-700 text-white text-sm font-semibold">Reset</button>
+          </div>
+          <label class="font-bold text-sm uppercase">Text Resource (Tokens: {inText().split("").length})</label>
+          <textarea
+            value={inText()}
+            oninput={(e) => setInText(e.target.value)}
+            class="p-2 border rounded outline-none h-full"></textarea>
+        </div>
+        <div class={"bg-slate-50 flex flex-col overflow-auto " + (summaries().length > 1 ? "w-1/3" : "hidden")}>
+          <label class="font-bold text-sm uppercase">Chunk Details (Chunks: {summaries().length})</label>
+          {summaries().length > 0 && <>
+            <For each={summaries()}>{(chunkSummary, idx) =>
+              <div class="flex flex-col w-full border rounded-md mb-2">
+                <div class="p-1 flex flex-col bg-teal-50">
+                  <label class="bg-slate-800 text-white text-sm font-semibold uppercase">Chunk text - {idx() + 1}</label>
+                  <hr />
+                  {chunkSummary.content}
                 </div>
+                <div class="p-1 flex flex-col bg-teal-100">
+                  <label class="bg-slate-800 text-white text-sm font-semibold uppercase">Summary - {idx() + 1}</label>
+                  <hr />
+                  {chunkSummary.summary}</div>
+              </div>
+            }
+            </For>
+          </>
+          }
+        </div>
+        <div class={"bg-slate-50 flex flex-col overflow-auto " + (summaries().length > 1 ? "w-1/3" : "w-1/2")}>
+          <label class="font-bold text-sm uppercase">Summary (Chunks: {summaries().length})</label>
+          {outText ? <>
+            <div class=' bg-slate-50 p-2 round-xl overflow-auto'>
+              <For each={outText()}>{(text) =>
+                <SolidMarkdown children={text} />
               }
               </For>
-            </> : <>
-            </>}
-          </div>
-          <div class={"flex flex-col p-2 " + (summaries().length > 1 ? "w-1/3" : "w-1/2")}>
-            {/* output */}
-            <label class="font-bold text-sm uppercase">Summary (Chunks: {summaries().length})</label>
-            {outText ? <>
-              {/* <textarea
-                value={outText}
-                class="p-2 border rounded bg-slate-300" rows={10} readOnly></textarea> */}
-              <div class=' bg-slate-300 p-2 round-xl overflow-auto'>
-                {/* {outText()} */}
-                <For each={outText()}>{(text) =>
-                  <SolidMarkdown children={text} />
-                }
-                </For>
-              </div>
-            </> : <>
-              <label class="bg-slate-300 p-2 text-sm uppercase">{status()}</label>
-            </>}
-          </div>
+            </div>
+          </> : <>
+            <label class="bg-slate-300 p-2 text-sm uppercase">{status()}</label>
+          </>}
         </div>
-      </main>
+      </div>
+      <footer class={"h-[30px] text-white px-2 flex items-center space-x-2 " + (processing() ? "bg-red-600" : "bg-purple-950")}>
+        {processing() && <Spinner type={SpinnerType.puff} color="white" class="inline-block" height={20} />}
+        <label>{Labels.title}</label>
+      </footer>
     </>
   )
 }
